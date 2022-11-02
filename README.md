@@ -1,92 +1,233 @@
-# Demo fmnist MLOps pipeline
+<H1> Demo Fashion-MNIST (IML4E) </H1>
 
+Demo MLOps project for the IML4E OSS experimentation platform.
 
+![](turorials/img/iml4e_full.png)
 
-## Getting started
+[TOC]
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Project structure
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- [`conf/`](conf): Configuration files.
+- [`training/`](training): Source code, including data processing, models and training code.
+- [`pipeline/`](pipeline): Kubeflow components and pipeline for workflow orchestration in a kubernetes cluster.
+- [`build.sh`](build.sh): Script to build and push the docker image.
+- [`tests/`](tests): Pytest unit-tests.
+- [`tutorials/`](turorials): Tutorials for using the workflow and learning about the MLOps component.
 
-## Add your files
+## Setup
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+Install base dependencies:
 
+```bash
+pip install --upgrade pip
+pip install -e '.[tf,kfp]'
 ```
-cd existing_repo
-git remote add origin https://gitlab.fokus.fraunhofer.de/iml4e/demo-fmnist-mlops-pipeline.git
-git branch -M main
-git push -uf origin main
+
+The option `tf` above installs TensorFlow. Do not include this if you install TensorFlow using [some other method](https://www.tensorflow.org/install).
+
+### Infrastructure setup
+
+All training scripts can be run locally. However, a kubernetes cluster with the
+following resources is needed in order to run the Kubeflow pipeline:
+
+* [kubeflow pipelines](https://www.kubeflow.org/docs/components/pipelines/introduction/)
+* [MLFlow](https://mlflow.org/) server
+* Image registry
+
+This demo uses the [OSS experimentation platform](https://gitlab.fokus.fraunhofer.de/iml4e/iml4e_oss_exp_platform/-/tree/main).
+Clone the OSS experimentation platform [repository](https://gitlab.fokus.fraunhofer.de/iml4e/iml4e_oss_exp_platform/-/tree/main)
+and follow the instructions to install the platform locally.
+
+> **Note**: When installing the OSS experimentation platform, remember to install the optional local image registry, as it is required for this demo.
+
+## Configuration files
+
+Most configurable settings are defined and loaded from external [Hydra](https://hydra.cc/)
+yaml files in the [`conf/`](conf) directory.
+
+## Training
+
+The [`training`](training) directory contains all the script needed for the training
+pipeline. The main steps of the training workflow are:
+
+### 1. Pull data
+
+The [`pull_data.py`](training/pull_data.py) script is used to pull the data tracked
+by DVC.
+
+```bash
+python -m training.pull_data
+```
+For more help, see `python -m training.pull_data --help`.
+
+### 2. Preprocessing data
+
+Script to preprocess the data ([`preprocess_data.py`](training/preprocess_data.py)). 
+Code for data processing should be added here.
+
+```bash
+python -m training.preprocess_data
+```
+For more details, see `python -m training.preprocess_data --help`.
+
+### 3. Training
+
+Define your models in the [`model.py`](training/model.py) script and add its
+corresponding build functions to the `MODELS_FACTORY`. Add here the implementation
+details needed to interact with the models (train, evaluate, save, etc.).
+
+Training and model parameters are loaded from a training config file in the
+[`conf/`](./conf) directory. If you need to add or modify configuration variables,
+add/modify the configs in [`conf/training`](conf/training) and the values are
+automatically available in the loaded configuration object in the code.
+
+Run the training with the [`train.py`](training/train.py) script.
+
+```bash
+python -m training.train my-experiment-name
+```
+For more details, see `python -m training.train --help`.
+
+The [`tracker.py`](./training/tracker.py) script contains the code needed for model and
+experiment tracking.
+
+There are three ways to track the run: storing data to filesystem,
+using local containerized tracking service, and using an external tracking service.
+Either way, MLFLow's library is used to track the parameters, metadata, and artifacts
+including the model. The model training output is written to a folder specified in the
+input arguments.
+
+To learn more on How to define and train your model, check out the [build-and-train-your-model.md](tutorials/build-and-train-your-model.md) tutorial.
+
+### 4. Evaluation
+
+The [`evaluate.py`](./training/evaluate.py) script is used to read and compare the
+evaluation metrics generated during training against the thresholds values defined in the 
+[`threshold_metrics_for_evaluation.json`](./conf/threshold_metrics_for_evaluation.json)
+
+```bash
+python -m training.evaluate
+```
+For more details, see `python -m training.evaluate --help`.
+
+To learn more on how the evaluation works, check out the [model-evaluation.md](tutorials/model-evaluation.md) tutorial.
+
+### 5. Registration
+
+Finally, the [`register`](./training/register.py) script is used to register a trained
+model if it passes the evaluation criteria.
+
+```bash
+python -m training.register my-model-registry-name
+```
+For more details, see `python -m training.register --help`.
+
+## Pipeline
+
+The [`pipeline`](./pipeline) directory contains the Kubeflow pipeline used to
+orchestrate the training workflow. 
+
+The above steps are used here as components of the pipeline:
+
+- [`pull_data_component.yaml`](./pipeline/components/pull_data_component.yaml)
+- [`preprocess_data_component.yaml`](./pipeline/components/preprocess_data_component.yaml)
+- [`train_component.yaml`](./pipeline/components/train_component.yaml)
+- [`evaluation_component.yaml`](./pipeline/components/evaluation_component.yaml)
+- [`registration_component.yaml`](./pipeline/components/registration_component.yaml)
+
+Pipeline related settings are also loaded from config files in the
+[`conf/`](conf) directory.
+
+To learn more on how to build a kubeflow pipelines, check out the [model-training-pipeline-overview.md](https://bitbucket.org/siloai/rd-mlops-project-template/src/main/tutorials/demo/3_Model_training_pipeline_overview.md) tutorial.
+
+The steps to run the training pipeline remotely in a cluster using kubeflow pipelines are:
+
+### 1. Build and push the Docker image (if needed)
+
+Use the [`build.sh`](build.sh) script to build and push the training image to the
+image registry.
+
+```bash
+./build.sh -p IMAGE_TAG
+```
+For more details, see `./build.sh -h`.
+
+### 2. Compile pipeline to an Argo Workflow yaml
+
+Compile the Kubeflow Pipeline with the newly created Docker image tag.
+
+```bash
+python -m pipeline.compile IMAGE_TAG [--output pipeline.yaml]
+```
+For more details, see `python -m pipeline.compile --help`.
+
+### 3. Submit the pipeline
+
+The [`submit.py`](pipeline/submit.py) script is used to submit the compiled pipeline to
+the Kubeflow cluster.
+
+```bash
+python -m pipeline.submit
+```
+For more details, see `python -m pipeline.submit --help`.
+
+If no host URI is specified, it will use the cluster
+currently configured in the [`kubectl`](https://kubernetes.io/docs/tasks/tools/) `current-context`.
+
+The parameters present in the config yamls can also be overridden through the CLI. For example,
+to override the value of `submit_config.experiment: default` and `submit_config.run: `,
+you can pass them as
+
+```bash
+python -m pipeline.submit submit_config.experiment=myExperimentName submit_config.run=myRunName
 ```
 
-## Integrate with your tools
+Access the Kubeflow pipelines dashboard using `kubectl port-forward`:
 
-- [ ] [Set up project integrations](https://gitlab.fokus.fraunhofer.de/iml4e/demo-fmnist-mlops-pipeline/-/settings/integrations)
+```bash
+kubectl port-forward --namespace kubeflow svc/ml-pipeline-ui 8080:80
+```
+Now Kubeflow pipelines UI should be reachable at [http://localhost:8080](http://localhost:8080/)
 
-## Collaborate with your team
+## Access MLflow
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### a. Using local filesystem for tracking
 
-## Test and Deploy
+If you are using the local file system for tracking, or just running the training locally
+without setting up any MLFlow server, MLflow will create a `mlflow.db` file and a `mlruns/`
+directory where the logs, model and all data about it will be stored.
 
-Use the built-in continuous integration in GitLab.
+You can access MLflow Tracking UI by running the following command on
+the directory containing the newly created `mlruns/` and `mlflow.db` artifacts
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+```bash
+mlflow ui
+```
+and viewing it at [http://localhost:5000](http://localhost:5000).
 
-***
+> If you're using folders for tracking and there are errors about missing meta.yaml
+> file, try removing mlruns/ directory and trying again.
 
-# Editing this README
+### b. Using external MLflow server
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+If you are using a remote MLflow server in a kubernetes cluster, the MLflow UI should by
+accessible by using `kubectl port-forward`:
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```bash
+$ kubectl port-forward svc/mlflow 3000:5000 --namespace mlflow
+```
+Now MLFlow's UI should be reachable at [http://localhost:3000](http://localhost:3000).
 
-## Name
-Choose a self-explaining name for your project.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## How to test
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+The project is tested with pytest. Run tests with:
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+```bash
+# make sure you install the "dev" requirements
+pip install -e '.[tf,kfp,dev]'
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+# run tests
+pytest
+```

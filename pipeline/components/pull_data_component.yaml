@@ -1,0 +1,21 @@
+name: Pull Data
+
+description: Pull data from remote
+
+outputs:
+  - {
+     name: output_path,
+     type: LocalPath,
+     description: 'Path to the folder containing the downloaded data'
+    }
+
+implementation:
+  container:
+    image: PLACEHOLDER_IMAGE_REPOSITORY:PLACEHOLDER_TAG
+    command: [
+      python3,
+      -m,
+      training.pull_data,
+      --output-dir,
+      {outputPath: output_path}
+    ]

@@ -1,0 +1,12 @@
+# gpu specifications
+gpu_type: nvidia-tesla-t4
+gpu_count: 1
+# node selector constraints
+node_constraint_key: cloud.google.com/gke-accelerator
+node_constraint_value: ${gpu_config.gpu_type}
+# toleration rules to the gpu node-pool
+toleration_effect: NoSchedule
+toleration_key: gpu
+toleration_operator: Equal
+toleration_value: t4
+toleration_seconds:

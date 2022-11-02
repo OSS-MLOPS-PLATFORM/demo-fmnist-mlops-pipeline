@@ -1,0 +1,57 @@
+name: Training
+
+description: Reads training data and performs a training operation
+
+inputs:
+  - {
+     name: experiment,
+     type: String,
+     description: 'Name of the experiment that this particular run will be recorded'
+    }
+  - {
+     name: mlflow_tracking_uri,
+     type: String,
+     description: 'MLFlow tracking uri where the training session will be saved'
+    }
+  - {
+    name: mlflow_s3_endpoint_url,
+    type: String,
+    description: 'MLflow S3 endpoint to use as artifact store'
+  }
+  - {
+     name: input_data,
+     type: LocalPath,
+     description: 'Path to the folder containing input data files for training'
+    }
+  - {
+     name: experiment_parameters,
+     type: String,
+     description: 'Additional experiment parameters to be logged by the tracking service'
+    }
+
+outputs:
+  - {
+     name: output_path,
+     type: LocalPath,
+     description: 'Path to the folder containing the training outcomes'
+    }
+
+implementation:
+  container:
+    image: PLACEHOLDER_IMAGE_REPOSITORY:PLACEHOLDER_TAG
+    command: [
+      python3,
+      -m,
+      training.train,
+      {inputValue: experiment},
+      --mlflow-tracking-uri,
+      {inputValue: mlflow_tracking_uri},
+      --mlflow-s3-endpoint-url,
+      { inputValue: mlflow_s3_endpoint_url },
+      --input-data,
+      {inputPath: input_data},
+      --experiment-parameters,
+      {inputValue: experiment_parameters},
+      --output-dir,
+      {outputPath: output_path}
+    ]

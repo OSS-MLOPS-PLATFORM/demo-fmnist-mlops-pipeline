@@ -1,0 +1,12 @@
+# TF 2.7.0 has Python 3.8.10
+FROM tensorflow/tensorflow:2.7.0
+
+# Install git for MLFlow client
+RUN apt-get update && apt-get install git -y
+
+RUN pip install --upgrade pip setuptools
+
+WORKDIR /app
+COPY . .
+
+RUN pip install -e .

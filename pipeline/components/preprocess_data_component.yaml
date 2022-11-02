@@ -1,0 +1,30 @@
+name: Preprocess data
+
+description: Preprocess the data to prepare for training
+
+inputs:
+  - {
+     name: input_data,
+     type: LocalPath,
+     description: 'Path to the folder containing the original input data files'
+    }
+
+outputs:
+  - {
+     name: output_path,
+     type: LocalPath,
+     description: 'Path to the folder containing the processed data'
+    }
+
+implementation:
+  container:
+    image: PLACEHOLDER_IMAGE_REPOSITORY:PLACEHOLDER_TAG
+    command: [
+      python3,
+      -m,
+      training.preprocess_data,
+      --input-data,
+      {inputPath: input_data},
+      --output-dir,
+      {outputPath: output_path}
+    ]

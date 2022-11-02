@@ -1,0 +1,38 @@
+name: Evaluation
+
+description: Reads training's session evaluation metrics
+ and evaluates those according to threshold values
+
+inputs:
+  - {
+     name: training_output_dir,
+     type: LocalPath,
+     description: 'Path to the folder containing the training outcomes'
+    }
+  - {
+     name: mlflow_tracking_uri,
+     type: String,
+     description: 'MLFlow tracking uri where the training session has been saved'
+    }
+
+outputs:
+  - {
+     name: output_path,
+     type: LocalPath,
+     description: 'Path to the folder containing the evaluation outcomes'
+    }
+
+implementation:
+  container:
+    image: PLACEHOLDER_IMAGE_REPOSITORY:PLACEHOLDER_TAG
+    command: [
+      python3,
+      -m,
+      training.evaluate,
+      --training-output-dir,
+      {inputPath: training_output_dir},
+      --mlflow-tracking-uri,
+      {inputValue: mlflow_tracking_uri},
+      --output-dir,
+      {outputPath: output_path}
+    ]

@@ -1,0 +1,16 @@
+host:
+mlflow_tracking_uri: http://mlflow.mlflow.svc.cluster.local:5000
+mlflow_s3_endpoint_url: http://mlflow-minio-service.mlflow.svc.cluster.local:9000
+experiment: default
+run:
+model_registry_name: default-model
+
+
+# DESCRIPTION PARAMS
+# - host: Host name to Kubeflow Pipelines, defaults to the in-cluster service DNS
+#   name or Kubeflow instance in the current Kubernetes context.
+# - mlflow_tracking_uri: MLFlow server address.
+# - mlflow_s3_endpoint_url: MLflow S3 endpoint address to use as artifact store.
+# - experiment: Experiment name to use in MLFlow and Kubeflow.
+# - run: Run name to show in Kubeflow Pipeline runs.
+# - model_registry_name: Model name to register in case of successful registration.

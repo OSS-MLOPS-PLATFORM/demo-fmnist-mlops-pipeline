@@ -1,0 +1,3 @@
+defaults:
+  - model_config: baseline
+  - training_config: default

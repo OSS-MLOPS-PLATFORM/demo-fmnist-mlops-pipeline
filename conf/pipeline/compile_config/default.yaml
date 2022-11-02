@@ -1,0 +1,7 @@
+image_repository: "127.0.0.1:5001"
+training_image_url: "${compile_config.image_repository}/training"
+
+
+# DESCRIPTION PARAMS
+# - image_repository: Image registry URI.
+# - training_image_url: Registry path to the training images.
