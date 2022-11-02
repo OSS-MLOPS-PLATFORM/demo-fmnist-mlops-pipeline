@@ -2,7 +2,7 @@
 
 Demo MLOps project for the IML4E OSS experimentation platform.
 
-![](turorials/img/iml4e_full.png)
+![](tutorials/img/iml4e_full.png)
 
 [TOC]
 
@@ -13,7 +13,7 @@ Demo MLOps project for the IML4E OSS experimentation platform.
 - [`pipeline/`](pipeline): Kubeflow components and pipeline for workflow orchestration in a kubernetes cluster.
 - [`build.sh`](build.sh): Script to build and push the docker image.
 - [`tests/`](tests): Pytest unit-tests.
-- [`tutorials/`](turorials): Tutorials for using the workflow and learning about the MLOps component.
+- [`tutorials/`](tutorials): Tutorials for using the workflow and learning about the MLOps component.
 
 ## Setup
 
@@ -98,7 +98,7 @@ Either way, MLFLow's library is used to track the parameters, metadata, and arti
 including the model. The model training output is written to a folder specified in the
 input arguments.
 
-To learn more on How to define and train your model, check out the [build-and-train-your-model.md](tutorials/build-and-train-your-model.md) tutorial.
+To learn more on How to define and train your model, check out the [2-Build-and-train-your-own-model.md](tutorials/2-Build-and-train-your-own-model.md) tutorial.
 
 ### 4. Evaluation
 
@@ -111,7 +111,7 @@ python -m training.evaluate
 ```
 For more details, see `python -m training.evaluate --help`.
 
-To learn more on how the evaluation works, check out the [model-evaluation.md](tutorials/model-evaluation.md) tutorial.
+To learn more on how the evaluation works, check out the [3-Model-evaluation.md](tutorials/3-Model-evaluation.md) tutorial.
 
 ### 5. Registration
 
@@ -139,7 +139,7 @@ The above steps are used here as components of the pipeline:
 Pipeline related settings are also loaded from config files in the
 [`conf/`](conf) directory.
 
-To learn more on how to build a kubeflow pipelines, check out the [model-training-pipeline-overview.md](https://bitbucket.org/siloai/rd-mlops-project-template/src/main/tutorials/demo/3_Model_training_pipeline_overview.md) tutorial.
+To learn more on how to build a kubeflow pipelines, check out the [1-Model-training-pipeline-overview.md](tutorials/1-Model-training-pipeline-overview.md) tutorial.
 
 The steps to run the training pipeline remotely in a cluster using kubeflow pipelines are:
 
