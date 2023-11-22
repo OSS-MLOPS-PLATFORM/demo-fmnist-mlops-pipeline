@@ -170,7 +170,8 @@ cython_debug/
 # Output written by scripts
 output/
 
-data/
+data/*
+!tests/resources/data
 
 # IDEs
 .idea/

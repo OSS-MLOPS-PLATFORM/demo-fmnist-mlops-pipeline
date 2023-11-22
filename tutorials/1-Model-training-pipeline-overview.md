@@ -99,7 +99,9 @@ The optional flags are:
 You can monitor the pipeline using Kubeflow dashboard
 
 ```bash
-kubectl port-forward -n kubeflow svc/ml-pipeline-ui 8080:80
+kubectl port-forward --namespace istio-system svc/istio-ingressgateway 8080:80
 ```
 
 Then, the dashboard should be available at [http://localhost:8080](http://localhost:8080).
+
+> User / Password: user@example.com / 12341234

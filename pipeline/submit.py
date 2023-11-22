@@ -8,6 +8,7 @@ import kfp
 import kfp_server_api
 
 from .config import DEFAULT_RUN_PIPELINE_FILE, get_config
+from .auth_kubeflow import get_istio_auth_session
 
 logger = logging.getLogger(__name__)
 
@@ -76,17 +77,27 @@ def run_pipeline(
     mlflow_s3_endpoint_url: str,
     experiment: str,
     model_registry_name: str,
+    kubeflow_url: str,
+    kubeflow_username: str,
+    kubeflow_password: str,
+    namespace: str,
     wait: bool,
     register_model: bool,
     run_name: typing.Optional[str] = None,
 ):
-    logger.info(f"Connecting to Kubeflow Pipelines at {kfp_host}")
-    client = kfp.Client(host=kfp_host)
-
     logger.info(
         f"Running pipeline from file: {pipeline_file} with run name: {run_name}"
     )
-
+    auth_session = get_istio_auth_session(
+        url=kubeflow_url,
+        username=kubeflow_username,
+        password=kubeflow_password
+    )
+    logger.info(f"Connecting to Kubeflow Pipelines at {kfp_host}")
+    client = kfp.Client(
+        host=f"{kubeflow_url}/pipeline",
+        cookies=auth_session["session_cookie"]
+    )
     created_run = client.create_run_from_pipeline_package(
         pipeline_file=pipeline_file,
         arguments={
@@ -99,6 +110,7 @@ def run_pipeline(
         enable_caching=False,
         run_name=run_name,
         experiment_name=experiment,
+        namespace=namespace,
     )
 
     run_id = created_run.run_id
@@ -141,10 +153,42 @@ def run_pipeline(
     type=bool,
     help="""Whether to wait until the Kubeflow pipeline finishes execution""",
 )
-@click.argument("overrides", nargs=-1, type=click.UNPROCESSED)
+@click.argument(
+    "overrides",
+    nargs=-1,
+    type=click.UNPROCESSED
+)
+@click.option(
+    "--namespace",
+    type=str,
+    default="kubeflow-user-example-com",
+    help="Name of the user namespace to run the pipeline in",
+)
+@click.option(
+    "--kubeflow-url",
+    type=str,
+    default="http://localhost:8080",
+    help="URL to Kubeflow",
+)
+@click.option(
+    "--kubeflow-username",
+    type=str,
+    default="user@example.com",
+    help="Kubeflow username",
+)
+@click.option(
+    "--kubeflow-password",
+    type=str,
+    default="12341234",
+    help="Kubeflow password",
+)
 def cli(
     pipeline_file: str,
     register: bool,
+    namespace: str,
+    kubeflow_url: str,
+    kubeflow_username: str,
+    kubeflow_password: str,
     wait: bool,
     overrides: list = None,
 ):
@@ -161,6 +205,10 @@ def cli(
         experiment=cfg.submit_config.experiment,
         model_registry_name=cfg.submit_config.model_registry_name,
         run_name=cfg.submit_config.run,
+        namespace=namespace,
+        kubeflow_url=kubeflow_url,
+        kubeflow_username=kubeflow_username,
+        kubeflow_password=kubeflow_password,
         wait=wait,
         register_model=register,
     )

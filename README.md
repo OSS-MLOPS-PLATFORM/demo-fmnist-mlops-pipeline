@@ -149,7 +149,9 @@ Use the [`build.sh`](build.sh) script to build and push the training image to th
 image registry.
 
 ```bash
-./build.sh -p IMAGE_TAG
+export IMAGE_TAG=t001
+
+./build.sh -p $IMAGE_TAG
 ```
 For more details, see `./build.sh -h`.
 
@@ -158,17 +160,27 @@ For more details, see `./build.sh -h`.
 Compile the Kubeflow Pipeline with the newly created Docker image tag.
 
 ```bash
-python -m pipeline.compile IMAGE_TAG [--output pipeline.yaml]
+python -m pipeline.compile $IMAGE_TAG [--output pipeline.yaml]
 ```
 For more details, see `python -m pipeline.compile --help`.
 
 ### 3. Submit the pipeline
 
+First, port-forward the Kubeflow ingress gateway:
+
+```shell
+kubectl port-forward --namespace istio-system svc/istio-ingressgateway 8080:80
+```
+
+Now Kubeflow pipelines UI should be reachable at [http://localhost:8080](http://localhost:8080/)
+
+> User / Password: user@example.com / 12341234
+
 The [`submit.py`](pipeline/submit.py) script is used to submit the compiled pipeline to
 the Kubeflow cluster.
 
 ```bash
-python -m pipeline.submit
+python -m pipeline.submit --register --kubeflow-url http://localhost:8080 --kubeflow-username user@example.com --kubeflow-password 12341234 --namespace kubeflow-user-example-com
 ```
 For more details, see `python -m pipeline.submit --help`.
 
@@ -183,12 +195,16 @@ you can pass them as
 python -m pipeline.submit submit_config.experiment=myExperimentName submit_config.run=myRunName
 ```
 
+## Access Kubeflow
+
 Access the Kubeflow pipelines dashboard using `kubectl port-forward`:
 
 ```bash
 kubectl port-forward --namespace kubeflow svc/ml-pipeline-ui 8080:80
 ```
 Now Kubeflow pipelines UI should be reachable at [http://localhost:8080](http://localhost:8080/)
+
+> User / Password: user@example.com / 12341234
 
 ## Access MLflow
 

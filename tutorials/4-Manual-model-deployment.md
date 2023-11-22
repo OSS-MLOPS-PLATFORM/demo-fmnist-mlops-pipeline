@@ -40,7 +40,7 @@ The steps are as follows:
    metadata:
      # your model name here
      name: "fmnist"
-     namespace: "kserve-inference"
+     namespace: "kubeflow-user-example-com"
      annotations:
        prometheus.io/scrape: "true"
        prometheus.io/path: /metrics
@@ -81,7 +81,7 @@ Open another terminal and run:
 export NAME=fmnist
 export INGRESS_HOST="127.0.0.1"
 export INGRESS_PORT="8080"
-export SERVICE_HOSTNAME=$(kubectl get inferenceservice $NAME -n kserve-inference -o jsonpath='{.status.url}' | cut -d "/" -f 3)
+export SERVICE_HOSTNAME=$(kubectl get inferenceservice $NAME -n kubeflow-user-example-com -o jsonpath='{.status.url}' | cut -d "/" -f 3)
 
 curl -v -H "Host: ${SERVICE_HOSTNAME}" http://${INGRESS_HOST}:${INGRESS_PORT}/v1/models/${NAME}:predict -d @./resources/fmnist-sample-input.json
 ```
