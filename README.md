@@ -155,6 +155,10 @@ export IMAGE_TAG=t001
 ```
 For more details, see `./build.sh -h`.
 
+> **Note**: It is set up to use a local image registry (local setup).
+> If you want to use an external registry, you need to modify the image repository address
+> in the [build script](build.sh) and [pipeline config](conf/pipeline/compile_config/default.yaml).
+
 ### 2. Compile pipeline to an Argo Workflow yaml
 
 Compile the Kubeflow Pipeline with the newly created Docker image tag.
