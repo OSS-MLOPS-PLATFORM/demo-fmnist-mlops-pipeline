@@ -39,8 +39,6 @@ This demo uses the [OSS experimentation platform](https://gitlab.fokus.fraunhofe
 Clone the OSS experimentation platform [repository](https://gitlab.fokus.fraunhofer.de/iml4e/iml4e_oss_exp_platform/-/tree/main)
 and follow the instructions to install the platform locally.
 
-> **Note**: When installing the OSS experimentation platform, remember to install the optional local image registry, as it is required for this demo.
-
 ## Configuration files
 
 Most configurable settings are defined and loaded from external [Hydra](https://hydra.cc/)
