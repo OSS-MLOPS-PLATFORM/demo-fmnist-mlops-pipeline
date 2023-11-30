@@ -156,6 +156,7 @@ For more details, see `./build.sh -h`.
 > **Note**: It is set up to use a local image registry (local setup).
 > If you want to use an external registry, you need to modify the image repository address
 > in the [build script](build.sh) and [pipeline config](conf/pipeline/compile_config/default.yaml).
+> > If using Google artifact registry, you may need to register gcloud as credential helper for the push to work. See [here](https://cloud.google.com/sdk/gcloud/reference/auth/configure-docker).
 
 ### 2. Compile pipeline to an Argo Workflow yaml
 
