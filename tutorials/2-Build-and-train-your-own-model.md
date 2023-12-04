@@ -2,8 +2,6 @@
 
 This tutorial will guide you on how to create and train your custom model.
 
-[TOC]
-
 ## Concepts and terminology
 
 - **Model definition**: The model src code is defined in [`training/model.py`](/training/model.py). Also in this file, we can define model and training parameters.

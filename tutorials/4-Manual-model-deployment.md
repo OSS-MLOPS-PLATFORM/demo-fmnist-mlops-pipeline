@@ -1,7 +1,5 @@
 <h1> Manual Model Deployment </h1>
 
-[TOC]
-
 ## Overview
 
 This tutorial will guide you on how to manually deploy a trained model.

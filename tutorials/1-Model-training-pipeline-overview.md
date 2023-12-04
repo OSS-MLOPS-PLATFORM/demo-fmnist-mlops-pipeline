@@ -4,8 +4,6 @@ This tutorial guides you through building a simple ML training pipeline.
 
 This tutorial uses [MLFlow](https://mlflow.org/) to track the experiment and register the model, and [Kubeflow Pipeline](https://www.kubeflow.org/docs/components/pipelines/introduction/) to orchestrate repeatable workflow and run workflows with different parameters.
 
-[TOC]
-
 ![Experiment View](img/pipeline-graph.png)
 
 ## Why ML training pipeline
