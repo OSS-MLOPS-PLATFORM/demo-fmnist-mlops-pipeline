@@ -2,8 +2,6 @@
 
 This readme guides you on how to work with evaluating model in our pipeline.
 
-[TOC]
-
 ## Purpose of the evaluation step
 
 The evaluation step is introduced after the execution of the training step. During the training step evaluation metrics have been generated and stored in MLFlow UI. Those evaluation metrics should meet some particular threshold values and this is the purpose of this step.

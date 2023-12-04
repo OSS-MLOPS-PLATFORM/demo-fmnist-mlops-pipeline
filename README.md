@@ -4,8 +4,6 @@ Demo MLOps project for the IML4E OSS experimentation platform.
 
 ![](tutorials/img/iml4e_full.png)
 
-[TOC]
-
 ## Project structure
 
 - [`conf/`](conf): Configuration files.
