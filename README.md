@@ -1,6 +1,6 @@
-<H1> Demo Fashion-MNIST (IML4E) </H1>
+<H1> Demo Fashion-MNIST </H1>
 
-Demo MLOps project for the IML4E OSS experimentation platform.
+Demo MLOps project for the [OSS MLOps Platform](https://github.com/OSS-MLOPS-PLATFORM/oss-mlops-platform).
 
 ![](tutorials/img/iml4e_full.png)
 
@@ -33,8 +33,8 @@ following resources is needed in order to run the Kubeflow pipeline:
 * [MLFlow](https://mlflow.org/) server
 * Image registry
 
-This demo uses the [OSS experimentation platform](https://gitlab.fokus.fraunhofer.de/iml4e/iml4e_oss_exp_platform/-/tree/main).
-Clone the OSS experimentation platform [repository](https://gitlab.fokus.fraunhofer.de/iml4e/iml4e_oss_exp_platform/-/tree/main)
+This demo uses the [OSS MLOps Platform](https://github.com/OSS-MLOPS-PLATFORM/oss-mlops-platform).
+Clone the OSS MLOps Platform [repository](https://github.com/OSS-MLOPS-PLATFORM/oss-mlops-platformn)
 and follow the instructions to install the platform locally.
 
 ## Configuration files
